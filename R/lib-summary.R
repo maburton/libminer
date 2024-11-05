@@ -14,16 +14,35 @@ lib_summary <- function(sizes = FALSE) {
   if(!is.logical(sizes)){
     stop("sizes must be logical")
   }
-  pkgs <- utils::installed.packages() # what's installed in our system
+  pkgs <- lib()
   pkg_tbl <- table(pkgs[, "LibPath"]) # pull out the library path and summarizes
   pkg_df <- as.data.frame(pkg_tbl, stringsAsFactors = FALSE) #format as df
   names(pkg_df) <- c("Library", "n_packages")
 
   if(isTRUE(sizes)){
-    pkg_df$lib_size <- map_dbl(
-      pkg_df$Library,
-      \(x) sum(fs::file_size(fs::dir_ls(x, recurse = TRUE)))
-    )
+    pkg_df <- calculate_sizes(pkg_df)
   }
   pkg_df
+}
+
+#' Generate a dataframe of installed packages
+#'
+#' @return dataframe of all packages installed on a system
+#' @export
+lib <- function() {
+  pkgs <- utils::installed.packages()
+  as.data.frame(pkgs, stringAsFactors = FALSE)
+}
+
+#' calculate sizes
+#'
+#' @param df a data.frame
+#'
+#' @return df with a lib_size column
+#' @noRd
+calculate_sizes <- function(df) {
+  df$lib_size <- map_dbl(
+    df$Library,
+    \(x) sum(fs::file_size(fs::dir_ls(x, recurse = TRUE)))
+  )
 }

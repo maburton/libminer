@@ -45,4 +45,5 @@ calculate_sizes <- function(df) {
     df$Library,
     \(x) sum(fs::file_size(fs::dir_ls(x, recurse = TRUE)))
   )
+  df
 }
